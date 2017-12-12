@@ -1,23 +1,57 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Component} from 'react';
+// import LineChart from './LineChart';
+// import ToolTip from './ToolTip';
+// import InfoBox from './InfoBox';
+import Header from './Header';
+
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: null,
+            fetchingData: true
+        }
+    }
+
+    getData() {
+        const url = 'https://api.coindesk.com/v1/bpi/historical/close.json';
+        return fetch(url, {
+            method: 'get',
+            dataType: 'json'
+        })
+    }
+
+    componentDidMount() {
+        this.getData()
+            .then((Response) => Response.json())
+            .then((data) => {
+                const sortedData = [];
+
+                console.log(Response.json);
+                console.log(data.bpi);
 
 
+                this.setState({
+                    data: sortedData,
+                    fetchingData: false
+                })
+
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
+    }
+
+    render() {
+        return (
+            <div className="App">
+                <Header/>
 
 
-
-      </div>
-    );
-  }
+            </div>
+        );
+    }
 }
 
 export default App;
