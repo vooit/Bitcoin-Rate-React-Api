@@ -27,16 +27,23 @@ class App extends Component {
         this.getData()
             .then((Response) => Response.json())
             .then((data) => {
-                const dupa = data.bpi;
+                const dataObj = data.bpi;
+                const fetchedData = [];
+                let count = 0;
 
-                let sortedData = dupa.map(a => a.foo);
+                for (let date in dataObj) {
+                    console.log(date)
+                    fetchedData.push(dataObj[date]);
+                }
+                console.log(fetchedData)
+                // let sortedData = dupa.map(a => a.foo);
 
                 this.setState({
-                    data: sortedData,
+                    data: fetchedData,
                     fetchingData: false
                 })
                 // console.log(data.bpi) //ok
-                // console.log(sortedData)
+                console.log(this.state.data);
                 // console.log(this.state.data)  // empty array
             })
             .catch(function (err) {
@@ -45,7 +52,7 @@ class App extends Component {
     }
 
     renderBitcoinHistory() {
-        return  <div>tiruriru</div>
+        return <div>tiruriru</div>
 
     }
 
