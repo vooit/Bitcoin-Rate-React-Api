@@ -1,72 +1,79 @@
 import React, {Component} from 'react';
-// import LineChart from './LineChart';
+import Header from './Header';
+// import moment from 'moment';
+import LineChart from './LineChart';
 // import ToolTip from './ToolTip';
 // import InfoBox from './InfoBox';
-import Header from './Header';
-import ListItem from './ListItem';
-
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            fetchingData: true,
             data: null,
-            fetchingData: true
+            hoverLoc: null,
+            activePoint: null
         }
     }
 
+
     getData() {
-        const url = 'https://api.coindesk.com/v1/bpi/historical/close.json';
-        return fetch(url, {
+        return fetch('https://api.coindesk.com/v1/bpi/historical/close.json', {
             method: 'get',
             dataType: 'json'
         })
     }
 
     componentDidMount() {
-        this.getData()
-            .then((Response) => Response.json())
-            .then((data) => {
-                const dataObj = data.bpi;
-                const fetchedData = [];
-                let count = 0;
 
-                for (let date in dataObj) {
-                    console.log(date)
-                    fetchedData.push(dataObj[date]);
+        this.getData().then(response => response.json())
+            .then((bitcoinData) => {
+                const sortedData = [];
+                let count = 0;
+                for (let date in bitcoinData.bpi) {
+                    sortedData.push({
+                        // d: moment(date).format('MMM DD'),
+                        p: bitcoinData.bpi[date].toLocaleString('us-EN', {
+                            style: 'currency',
+                            currency: 'USD'
+                        }),
+                        x: count, //previous days
+                        y: bitcoinData.bpi[date] // numerical price
+                    });
+                    count++;
                 }
-                console.log(fetchedData)
-                // let sortedData = dupa.map(a => a.foo);
 
                 this.setState({
-                    data: fetchedData,
+                    data: sortedData,
                     fetchingData: false
-                })
-                // console.log(data.bpi) //ok
-                console.log(this.state.data);
-                // console.log(this.state.data)  // empty array
+                });
+                console.log(this.state.data)
             })
-            .catch(function (err) {
-                console.log(err);
-            })
+            .catch((e) => {
+                console.log(e);
+            });
     }
 
-    renderBitcoinHistory() {
-        return <div>tiruriru</div>
-
-    }
 
     render() {
         const {data} = this.state;
         return (
-            <div className="App">
-                <Header/>
-                {this.renderBitcoinHistory()}
-                <ListItem/>
-                <div>{data}</div>
+            <div className='container'>
+                <div className='row'>
+                    <Header/>
+                    <h1>30 Day Bitcoin Price Chart</h1>
+                </div>
+                <div className="row">
+                    <div className='chart'>
+                        { !this.state.fetchingData ?
+                            <LineChart data={this.state.data}
+                                       // onChartHover={ (a, b) => this.handleChartHover(a, b) }
+                            />
+                            : null }
+                    </div>
+                </div>
             </div>
         );
     }
 }
-
 export default App;
